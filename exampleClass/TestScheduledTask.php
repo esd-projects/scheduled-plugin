@@ -18,4 +18,9 @@ class TestScheduledTask
     {
         $this->info("这是一次定时调用");
     }
+
+    public function dynamic()
+    {
+        $this->info("这是一次dynamic定时调用");
+    }
 }

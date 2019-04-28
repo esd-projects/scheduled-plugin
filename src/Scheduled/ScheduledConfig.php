@@ -46,11 +46,11 @@ class ScheduledConfig
      */
     public function addScheduled(ScheduledTask $scheduledTask)
     {
-        if (!Server::$isStart) {
-            //服务没启动可以直接添加
+        if (!Server::$isStart||Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
+            //调度进程可以直接添加
             $this->schedulerTasks[$scheduledTask->getName()] = $scheduledTask;
         } else {
-            //服务启动了这里需要动态添加，借助于Event
+            //非调度进程需要动态添加，借助于Event
             Server::$instance->getEventDispatcher()->dispatchProcessEvent(
                 new ScheduledAddEvent($scheduledTask),
                 Server::$instance->getProcessManager()->getProcessFromName(ScheduledPlugin::processName)
@@ -64,7 +64,7 @@ class ScheduledConfig
      */
     public function removeScheduled(ScheduledTask $scheduledTask)
     {
-        if (Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
+        if (!Server::$isStart||Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
             //调度进程可以直接移除
             unset($this->schedulerTasks[$scheduledTask->getName()]);
         } else {

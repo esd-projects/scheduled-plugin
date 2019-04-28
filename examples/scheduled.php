@@ -4,6 +4,7 @@ use GoSwoole\BaseServer\ExampleClass\Server\DefaultServer;
 use GoSwoole\BaseServer\Server\Config\PortConfig;
 use GoSwoole\BaseServer\Server\Config\ServerConfig;
 use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
+use GoSwoole\Plugins\Scheduled\ExampleClass\TestPort;
 use GoSwoole\Plugins\Scheduled\ExampleClass\TestScheduledTask;
 use GoSwoole\Plugins\Scheduled\ScheduledConfig;
 use GoSwoole\Plugins\Scheduled\ScheduledPlugin;
@@ -24,7 +25,7 @@ $serverConfig->setRootDir(__DIR__ . "/../");
 
 $server = new DefaultServer($serverConfig);
 //添加端口
-$server->addPort("http", $httpPortConfig);
+$server->addPort("http", $httpPortConfig,TestPort::class);
 //添加插件
 $scheduledConfig = new ScheduledConfig();
 //添加调度任务
@@ -38,7 +39,7 @@ $scheduledConfig = new ScheduledConfig();
 //| |    +-------------------- hour (0 - 23)
 //| +------------------------- min (0 - 59)
 //+--------------------------- sec (0 - 59)
-$scheduledConfig->addScheduled(new ScheduledTask("test","* * * * * *",TestScheduledTask::class,"test"));
+$scheduledConfig->addScheduled(new ScheduledTask("test","0 * * * * *",TestScheduledTask::class,"test"));
 $server->getPlugManager()->addPlug(new ScheduledPlugin($scheduledConfig));
 $server->addProcess("test1");
 //配置
