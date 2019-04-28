@@ -95,8 +95,6 @@ class ScheduledPlugin extends AbstractPlugin
             //添加定时器调度
             addTimerTick($this->scheduledConfig->getMinIntervalTime(), function () {
                 foreach ($this->scheduledConfig->getSchedulerTasks() as $scheduledTask) {
-                    print_r($scheduledTask->getCron()->getNextRunDate());
-                    var_dump($scheduledTask->getCron()->isDue());
                     if ($scheduledTask->getCron()->isDue()) {
                         //按执行次数从小到大排列
                         asort($this->processScheduledCount);

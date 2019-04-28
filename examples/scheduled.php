@@ -38,7 +38,7 @@ $scheduledConfig = new ScheduledConfig();
 //| |    +-------------------- hour (0 - 23)
 //| +------------------------- min (0 - 59)
 //+--------------------------- sec (0 - 59)
-$scheduledConfig->addScheduled(new ScheduledTask("test","0 * * * * *",TestScheduledTask::class,"test"));
+$scheduledConfig->addScheduled(new ScheduledTask("test","* * * * * *",TestScheduledTask::class,"test"));
 $server->getPlugManager()->addPlug(new ScheduledPlugin($scheduledConfig));
 $server->addProcess("test1");
 //配置
