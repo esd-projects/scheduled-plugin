@@ -14,7 +14,7 @@ date_default_timezone_set('Asia/Shanghai');
 //----多端口配置----
 $httpPortConfig = new PortConfig();
 $httpPortConfig->setHost("0.0.0.0");
-$httpPortConfig->setPort(8080);
+$httpPortConfig->setPort(8081);
 $httpPortConfig->setSockType(PortConfig::SWOOLE_SOCK_TCP);
 $httpPortConfig->setOpenHttpProtocol(true);
 

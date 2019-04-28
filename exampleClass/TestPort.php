@@ -42,13 +42,22 @@ class TestPort extends ServerPort
 
     public function onHttpRequest(Request $request, Response $response)
     {
-        $scheduledPlugin = Server::$instance->getPlugManager()->getPlug(ScheduledPlugin::class);
-        if($scheduledPlugin instanceof ScheduledPlugin) {
-            $scheduledPlugin->getScheduledConfig()->addScheduled(
-                new ScheduledTask("DynamicAdd","* * * * * *",TestScheduledTask::class,"dynamic")
-            );
+        $scheduledTask = new ScheduledTask("DynamicAdd", "* * * * * *", TestScheduledTask::class, "dynamic");
+        if($request->getServer(Request::SERVER_REQUEST_URI)=="/add") {
+            $scheduledPlugin = Server::$instance->getPlugManager()->getPlug(ScheduledPlugin::class);
+            if ($scheduledPlugin instanceof ScheduledPlugin) {
+                $scheduledPlugin->getScheduledConfig()->addScheduled(
+                    new ScheduledTask("DynamicAdd", "* * * * * *", TestScheduledTask::class, "dynamic")
+                );
+            }
+            $response->end("add");
+        }else{
+            $scheduledPlugin = Server::$instance->getPlugManager()->getPlug(ScheduledPlugin::class);
+            if ($scheduledPlugin instanceof ScheduledPlugin) {
+                $scheduledPlugin->getScheduledConfig()->removeScheduled($scheduledTask->getName());
+            }
+            $response->end("remove");
         }
-        $response->end("动态添加一个任务");
     }
 
     public function onWsMessage(WebSocketFrame $frame)

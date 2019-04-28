@@ -15,15 +15,15 @@ class ScheduledRemoveEvent extends Event
 {
     const ScheduledRemoveEvent = "ScheduledRemoveEvent";
 
-    public function __construct(ScheduledTask $data)
+    public function __construct(string $scheduledTaskName)
     {
-        parent::__construct(self::ScheduledRemoveEvent, $data);
+        parent::__construct(self::ScheduledRemoveEvent, $scheduledTaskName);
     }
 
     /**
      * @return ScheduledTask
      */
-    public function getTask(): ScheduledTask
+    public function getTaskName(): string
     {
         return $this->getData();
     }

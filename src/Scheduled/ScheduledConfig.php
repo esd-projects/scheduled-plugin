@@ -60,17 +60,17 @@ class ScheduledConfig
 
     /**
      * 移除调度
-     * @param ScheduledTask $scheduledTask
+     * @param String $scheduledTaskName
      */
-    public function removeScheduled(ScheduledTask $scheduledTask)
+    public function removeScheduled(String $scheduledTaskName)
     {
         if (!Server::$isStart||Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
             //调度进程可以直接移除
-            unset($this->schedulerTasks[$scheduledTask->getName()]);
+            unset($this->schedulerTasks[$scheduledTaskName]);
         } else {
             //非调度进程需要动态移除，借助于Event
             Server::$instance->getEventDispatcher()->dispatchProcessEvent(
-                new ScheduledRemoveEvent($scheduledTask),
+                new ScheduledRemoveEvent($scheduledTaskName),
                 Server::$instance->getProcessManager()->getProcessFromName(ScheduledPlugin::processName)
             );
         }

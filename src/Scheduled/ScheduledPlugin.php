@@ -94,7 +94,7 @@ class ScheduledPlugin extends AbstractPlugin
                     if ($event instanceof ScheduledAddEvent) {
                         $this->scheduledConfig->addScheduled($event->getTask());
                     } else if ($event instanceof ScheduledRemoveEvent) {
-                        $this->scheduledConfig->removeScheduled($event->getTask());
+                        $this->scheduledConfig->removeScheduled($event->getTaskName());
                     }
                 }
             });
