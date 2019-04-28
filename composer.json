@@ -1,0 +1,23 @@
+{
+  "require": {
+    "go-swoole/base-server": "~0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "GoSwoole\\Plugins\\": "src/",
+      "GoSwoole\\Plugins\\Scheduled\\ExampleClass\\": "exampleClass/"
+    }
+  },
+  "authors": [
+    {
+      "name": "tmtbe",
+      "email": "896369042@qq.com",
+      "homepage": "https://github.com/tmtbe"
+    }
+  ],
+  "name": "go-swoole/scheduled-plugin",
+  "type": "library",
+  "keywords": ["server", "swoole"],
+  "description": "scheduled-plugin",
+  "license": "MIT"
+}
