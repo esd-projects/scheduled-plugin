@@ -8,6 +8,7 @@
 
 namespace GoSwoole\Plugins\Scheduled;
 
+use GoSwoole\BaseServer\Coroutine\Channel;
 use GoSwoole\BaseServer\Plugins\Logger\GetLogger;
 use GoSwoole\BaseServer\Server\Context;
 use GoSwoole\BaseServer\Server\Plugin\AbstractPlugin;
@@ -15,6 +16,7 @@ use GoSwoole\BaseServer\Server\Server;
 use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
 use GoSwoole\Plugins\Scheduled\Event\ScheduledAddEvent;
 use GoSwoole\Plugins\Scheduled\Event\ScheduledExecuteEvent;
+use GoSwoole\Plugins\Scheduled\Event\ScheduledRemoveEvent;
 
 class ScheduledPlugin extends AbstractPlugin
 {
@@ -82,13 +84,17 @@ class ScheduledPlugin extends AbstractPlugin
             foreach (Server::$instance->getProcessManager()->getProcesses() as $process) {
                 $this->processScheduledCount[$process->getProcessId()] = 0;
             }
-            //监听动态添加的任务事件
+            //监听动态添加/移除的任务事件
             goWithContext(function () {
-                $channel = Server::$instance->getEventDispatcher()->listen(ScheduledAddEvent::ScheduledAddEvent);
+                $channel = new Channel();
+                Server::$instance->getEventDispatcher()->listen(ScheduledAddEvent::ScheduledAddEvent, $channel);
+                Server::$instance->getEventDispatcher()->listen(ScheduledRemoveEvent::ScheduledRemoveEvent, $channel);
                 while (true) {
                     $event = $channel->pop();
                     if ($event instanceof ScheduledAddEvent) {
                         $this->scheduledConfig->addScheduled($event->getTask());
+                    } else if ($event instanceof ScheduledRemoveEvent) {
+                        $this->scheduledConfig->removeScheduled($event->getTask());
                     }
                 }
             });
