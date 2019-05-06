@@ -9,31 +9,35 @@
 namespace GoSwoole\Plugins\Scheduled;
 
 
+use GoSwoole\BaseServer\Plugins\Config\BaseConfig;
 use GoSwoole\BaseServer\Server\Exception\ConfigException;
 use GoSwoole\BaseServer\Server\Server;
 use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
 use GoSwoole\Plugins\Scheduled\Event\ScheduledAddEvent;
 use GoSwoole\Plugins\Scheduled\Event\ScheduledRemoveEvent;
 
-class ScheduledConfig
+class ScheduledConfig extends BaseConfig
 {
+    const key = "scheduled";
     /**
      * 最小间隔时间
      * @var int
      */
-    private $minIntervalTime;
+    protected $minIntervalTime;
     /**
      * @var ScheduledTask[]
      */
-    private $schedulerTasks = [];
+    protected $schedulerTasks = [];
 
     /**
      * ScheduledConfig constructor.
      * @param int $minIntervalTime
      * @throws ConfigException
+     * @throws \ReflectionException
      */
     public function __construct($minIntervalTime = 1000)
     {
+        parent::__construct(self::key);
         $this->minIntervalTime = $minIntervalTime;
         if ($minIntervalTime < 1000) {
             throw new ConfigException("定时调度任务的最小时间单位为1s");

@@ -9,34 +9,36 @@
 namespace GoSwoole\Plugins\Scheduled\Beans;
 
 
+use GoSwoole\BaseServer\Plugins\Config\BaseConfig;
 use GoSwoole\Plugins\Scheduled\Cron\CronExpression;
 
-class ScheduledTask
+class ScheduledTask extends BaseConfig
 {
+    const key = "scheduled.task";
     const ProcessGroupAll = "all";
     /**
      * @var string
      */
-    private $name;
+    protected $name;
     /**
      * @var string
      */
-    private $expression;
+    protected $expression;
 
     /**
      * @var string
      */
-    private $className;
+    protected $className;
 
     /**
      * @var string
      */
-    private $functionName;
+    protected $functionName;
 
     /**
      * @var string
      */
-    private $processGroup;
+    protected $processGroup;
 
     /**
      * @var CronExpression
@@ -50,9 +52,11 @@ class ScheduledTask
      * @param $className
      * @param $functionName
      * @param string $processGroup
+     * @throws \ReflectionException
      */
     public function __construct($name, $expression, $className, $functionName, $processGroup = ScheduledTask::ProcessGroupAll)
     {
+        parent::__construct(self::key);
         $this->name = $name;
         $this->expression = $expression;
         $this->className = $className;

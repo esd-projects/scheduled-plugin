@@ -38,7 +38,9 @@ class ScheduledPlugin extends AbstractPlugin
     /**
      * ScheduledPlugin constructor.
      * @param ScheduledConfig|null $scheduledConfig
+     * @throws \DI\DependencyException
      * @throws \GoSwoole\BaseServer\Server\Exception\ConfigException
+     * @throws \ReflectionException
      */
     public function __construct(ScheduledConfig $scheduledConfig = null)
     {
@@ -63,10 +65,12 @@ class ScheduledPlugin extends AbstractPlugin
      * @param Context $context
      * @return mixed
      * @throws \GoSwoole\BaseServer\Server\Exception\ConfigException
+     * @throws \ReflectionException
      */
     public function beforeServerStart(Context $context)
     {
         //添加一个helper进程
+        $this->scheduledConfig->merge();
         $context->getServer()->addProcess(self::processName, HelperScheduledProcess::class, self::processGroupName);
     }
 
