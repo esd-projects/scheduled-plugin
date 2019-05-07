@@ -17,7 +17,6 @@ use GoSwoole\Plugins\Scheduled\Event\ScheduledExecuteEvent;
 class Scheduled
 {
     use GetLogger;
-    private $taskInstanceMap = [];
 
     public function __construct()
     {
@@ -38,15 +37,13 @@ class Scheduled
     /**
      * 执行调度
      * @param ScheduledTask $scheduledTask
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function execute(ScheduledTask $scheduledTask)
     {
-        $taskInstance = $this->taskInstanceMap[$scheduledTask->getName()] ?? null;
-        if ($taskInstance == null) {
-            $className = $scheduledTask->getClassName();
-            $taskInstance = new $className();
-            $this->taskInstanceMap[$scheduledTask->getName()] = $taskInstance;
-        }
+        $className = $scheduledTask->getClassName();
+        $taskInstance = Server::$instance->getContainer()->get($className);
         call_user_func([$taskInstance, $scheduledTask->getFunctionName()]);
         $this->debug("执行{$scheduledTask->getName()}任务");
     }
