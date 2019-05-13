@@ -6,15 +6,15 @@
  * Time: 14:39
  */
 
-namespace GoSwoole\Plugins\Scheduled;
+namespace ESD\Plugins\Scheduled;
 
 
-use GoSwoole\BaseServer\Plugins\Config\BaseConfig;
-use GoSwoole\BaseServer\Server\Exception\ConfigException;
-use GoSwoole\BaseServer\Server\Server;
-use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
-use GoSwoole\Plugins\Scheduled\Event\ScheduledAddEvent;
-use GoSwoole\Plugins\Scheduled\Event\ScheduledRemoveEvent;
+use ESD\BaseServer\Plugins\Config\BaseConfig;
+use ESD\BaseServer\Server\Exception\ConfigException;
+use ESD\BaseServer\Server\Server;
+use ESD\Plugins\Scheduled\Beans\ScheduledTask;
+use ESD\Plugins\Scheduled\Event\ScheduledAddEvent;
+use ESD\Plugins\Scheduled\Event\ScheduledRemoveEvent;
 
 class ScheduledConfig extends BaseConfig
 {

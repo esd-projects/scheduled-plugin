@@ -6,9 +6,9 @@
  * Time: 15:44
  */
 
-namespace GoSwoole\Plugins\Scheduled\ExampleClass;
+namespace ESD\Plugins\Scheduled\ExampleClass;
 
-use GoSwoole\BaseServer\Plugins\Logger\GetLogger;
+use ESD\BaseServer\Plugins\Logger\GetLogger;
 
 class TestScheduledTask
 {

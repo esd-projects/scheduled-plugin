@@ -6,11 +6,11 @@
  * Time: 13:50
  */
 
-namespace GoSwoole\Plugins\Scheduled;
+namespace ESD\Plugins\Scheduled;
 
 
-use GoSwoole\BaseServer\Server\Message\Message;
-use GoSwoole\BaseServer\Server\Process;
+use ESD\BaseServer\Server\Message\Message;
+use ESD\BaseServer\Server\Process;
 
 class HelperScheduledProcess extends Process
 {

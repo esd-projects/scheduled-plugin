@@ -6,16 +6,16 @@
  * Time: 16:44
  */
 
-namespace GoSwoole\Plugins\Scheduled\ExampleClass;
+namespace ESD\Plugins\Scheduled\ExampleClass;
 
 
-use GoSwoole\BaseServer\Server\Beans\Request;
-use GoSwoole\BaseServer\Server\Beans\Response;
-use GoSwoole\BaseServer\Server\Beans\WebSocketFrame;
-use GoSwoole\BaseServer\Server\Server;
-use GoSwoole\BaseServer\Server\ServerPort;
-use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
-use GoSwoole\Plugins\Scheduled\ScheduledPlugin;
+use ESD\BaseServer\Server\Beans\Request;
+use ESD\BaseServer\Server\Beans\Response;
+use ESD\BaseServer\Server\Beans\WebSocketFrame;
+use ESD\BaseServer\Server\Server;
+use ESD\BaseServer\Server\ServerPort;
+use ESD\Plugins\Scheduled\Beans\ScheduledTask;
+use ESD\Plugins\Scheduled\ScheduledPlugin;
 
 class TestPort extends ServerPort
 {

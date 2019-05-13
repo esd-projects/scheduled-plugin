@@ -6,17 +6,17 @@
  * Time: 14:37
  */
 
-namespace GoSwoole\Plugins\Scheduled;
+namespace ESD\Plugins\Scheduled;
 
-use GoSwoole\BaseServer\Coroutine\Channel;
-use GoSwoole\BaseServer\Plugins\Logger\GetLogger;
-use GoSwoole\BaseServer\Server\Context;
-use GoSwoole\BaseServer\Server\Plugin\AbstractPlugin;
-use GoSwoole\BaseServer\Server\Server;
-use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
-use GoSwoole\Plugins\Scheduled\Event\ScheduledAddEvent;
-use GoSwoole\Plugins\Scheduled\Event\ScheduledExecuteEvent;
-use GoSwoole\Plugins\Scheduled\Event\ScheduledRemoveEvent;
+use ESD\BaseServer\Coroutine\Channel;
+use ESD\BaseServer\Plugins\Logger\GetLogger;
+use ESD\BaseServer\Server\Context;
+use ESD\BaseServer\Server\Plugin\AbstractPlugin;
+use ESD\BaseServer\Server\Server;
+use ESD\Plugins\Scheduled\Beans\ScheduledTask;
+use ESD\Plugins\Scheduled\Event\ScheduledAddEvent;
+use ESD\Plugins\Scheduled\Event\ScheduledExecuteEvent;
+use ESD\Plugins\Scheduled\Event\ScheduledRemoveEvent;
 
 class ScheduledPlugin extends AbstractPlugin
 {
@@ -39,7 +39,7 @@ class ScheduledPlugin extends AbstractPlugin
      * ScheduledPlugin constructor.
      * @param ScheduledConfig|null $scheduledConfig
      * @throws \DI\DependencyException
-     * @throws \GoSwoole\BaseServer\Server\Exception\ConfigException
+     * @throws \ESD\BaseServer\Server\Exception\ConfigException
      * @throws \ReflectionException
      */
     public function __construct(ScheduledConfig $scheduledConfig = null)
@@ -64,7 +64,7 @@ class ScheduledPlugin extends AbstractPlugin
      * 在服务启动前
      * @param Context $context
      * @return mixed
-     * @throws \GoSwoole\BaseServer\Server\Exception\ConfigException
+     * @throws \ESD\BaseServer\Server\Exception\ConfigException
      * @throws \ReflectionException
      */
     public function beforeServerStart(Context $context)

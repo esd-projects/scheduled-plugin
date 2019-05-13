@@ -6,10 +6,10 @@
  * Time: 14:46
  */
 
-namespace GoSwoole\Plugins\Scheduled\Event;
+namespace ESD\Plugins\Scheduled\Event;
 
-use GoSwoole\BaseServer\Plugins\Event\Event;
-use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
+use ESD\BaseServer\Plugins\Event\Event;
+use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 
 class ScheduledAddEvent extends Event
 {

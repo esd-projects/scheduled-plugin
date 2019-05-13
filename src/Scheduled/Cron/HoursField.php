@@ -1,6 +1,6 @@
 <?php
 
-namespace GoSwoole\Plugins\Scheduled\Cron;
+namespace ESD\Plugins\Scheduled\Cron;
 
 use DateTimeInterface;
 use DateTimeZone;

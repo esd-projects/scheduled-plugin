@@ -6,13 +6,13 @@
  * Time: 15:05
  */
 
-namespace GoSwoole\Plugins\Scheduled;
+namespace ESD\Plugins\Scheduled;
 
 
-use GoSwoole\BaseServer\Plugins\Logger\GetLogger;
-use GoSwoole\BaseServer\Server\Server;
-use GoSwoole\Plugins\Scheduled\Beans\ScheduledTask;
-use GoSwoole\Plugins\Scheduled\Event\ScheduledExecuteEvent;
+use ESD\BaseServer\Plugins\Logger\GetLogger;
+use ESD\BaseServer\Server\Server;
+use ESD\Plugins\Scheduled\Beans\ScheduledTask;
+use ESD\Plugins\Scheduled\Event\ScheduledExecuteEvent;
 
 class Scheduled
 {
