@@ -27,7 +27,7 @@ class ScheduledConfig extends BaseConfig
     /**
      * @var ScheduledTask[]
      */
-    protected $schedulerTasks = [];
+    protected $scheduledTasks = [];
 
     /**
      * ScheduledConfig constructor.
@@ -52,7 +52,7 @@ class ScheduledConfig extends BaseConfig
     {
         if (!Server::$isStart || Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
             //调度进程可以直接添加
-            $this->schedulerTasks[$scheduledTask->getName()] = $scheduledTask;
+            $this->scheduledTasks[$scheduledTask->getName()] = $scheduledTask;
         } else {
             //非调度进程需要动态添加，借助于Event
             Server::$instance->getEventDispatcher()->dispatchProcessEvent(
@@ -70,7 +70,7 @@ class ScheduledConfig extends BaseConfig
     {
         if (!Server::$isStart || Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
             //调度进程可以直接移除
-            unset($this->schedulerTasks[$scheduledTaskName]);
+            unset($this->scheduledTasks[$scheduledTaskName]);
         } else {
             //非调度进程需要动态移除，借助于Event
             Server::$instance->getEventDispatcher()->dispatchProcessEvent(
@@ -91,28 +91,27 @@ class ScheduledConfig extends BaseConfig
     /**
      * @return ScheduledTask[]
      */
-    public function getSchedulerTasks(): array
+    public function getScheduledTasks(): array
     {
-        return $this->schedulerTasks;
+        return $this->scheduledTasks;
     }
 
     /**
-     * @param ScheduledTask[] $schedulerTasks
+     * @param array $scheduledTasks
      * @throws \ReflectionException
      */
-    public function setSchedulerTasks(array $schedulerTasks): void
+    public function setScheduledTasks(array $scheduledTasks): void
     {
-        foreach ($schedulerTasks as $key => $scheduledTask) {
+        foreach ($scheduledTasks as $key => $scheduledTask) {
             if ($scheduledTask instanceof ScheduledTask) {
-                $this->schedulerTasks[$scheduledTask->getName()] = $schedulerTasks;
+                $this->scheduledTasks[$scheduledTask->getName()] = $scheduledTask;
             } else {
                 $scheduledTaskInstance = new ScheduledTask(null, null, null, null);
                 $scheduledTaskInstance->buildFromConfig($scheduledTask);
                 $scheduledTaskInstance->setName($key);
-                $this->schedulerTasks[$scheduledTask->getName()] = $schedulerTasks;
+                $this->scheduledTasks[$scheduledTaskInstance->getName()] = $scheduledTaskInstance;
             }
         }
-        $this->schedulerTasks = $schedulerTasks;
     }
 
     /**

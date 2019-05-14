@@ -62,7 +62,9 @@ class ScheduledTask extends BaseConfig
         $this->className = $className;
         $this->functionName = $functionName;
         $this->processGroup = $processGroup;
-        $this->cron = CronExpression::factory($expression);
+        if ($expression != null) {
+            $this->cron = CronExpression::factory($expression);
+        }
     }
 
     /**
@@ -95,6 +97,7 @@ class ScheduledTask extends BaseConfig
     public function setExpression(string $expression): void
     {
         $this->expression = $expression;
+        $this->cron = CronExpression::factory($expression);
     }
 
     /**
