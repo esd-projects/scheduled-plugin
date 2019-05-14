@@ -50,7 +50,7 @@ class ScheduledConfig extends BaseConfig
      */
     public function addScheduled(ScheduledTask $scheduledTask)
     {
-        if (!Server::$isStart||Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
+        if (!Server::$isStart || Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
             //调度进程可以直接添加
             $this->schedulerTasks[$scheduledTask->getName()] = $scheduledTask;
         } else {
@@ -68,7 +68,7 @@ class ScheduledConfig extends BaseConfig
      */
     public function removeScheduled(String $scheduledTaskName)
     {
-        if (!Server::$isStart||Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
+        if (!Server::$isStart || Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() == ScheduledPlugin::processName) {
             //调度进程可以直接移除
             unset($this->schedulerTasks[$scheduledTaskName]);
         } else {
@@ -94,5 +94,32 @@ class ScheduledConfig extends BaseConfig
     public function getSchedulerTasks(): array
     {
         return $this->schedulerTasks;
+    }
+
+    /**
+     * @param ScheduledTask[] $schedulerTasks
+     * @throws \ReflectionException
+     */
+    public function setSchedulerTasks(array $schedulerTasks): void
+    {
+        foreach ($schedulerTasks as $key => $scheduledTask) {
+            if ($scheduledTask instanceof ScheduledTask) {
+                $this->schedulerTasks[$scheduledTask->getName()] = $schedulerTasks;
+            } else {
+                $scheduledTaskInstance = new ScheduledTask(null, null, null, null);
+                $scheduledTaskInstance->buildFromConfig($scheduledTask);
+                $scheduledTaskInstance->setName($key);
+                $this->schedulerTasks[$scheduledTask->getName()] = $schedulerTasks;
+            }
+        }
+        $this->schedulerTasks = $schedulerTasks;
+    }
+
+    /**
+     * @param int $minIntervalTime
+     */
+    public function setMinIntervalTime(int $minIntervalTime): void
+    {
+        $this->minIntervalTime = $minIntervalTime;
     }
 }
