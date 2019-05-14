@@ -12,7 +12,11 @@ use ESD\BaseServer\Coroutine\Channel;
 use ESD\BaseServer\Plugins\Logger\GetLogger;
 use ESD\BaseServer\Server\Context;
 use ESD\BaseServer\Server\Plugin\AbstractPlugin;
+use ESD\BaseServer\Server\PlugIn\PluginInterfaceManager;
 use ESD\BaseServer\Server\Server;
+use ESD\Plugins\AnnotationsScan\AnnotationsScanPlugin;
+use ESD\Plugins\AnnotationsScan\ScanClass;
+use ESD\Plugins\Scheduled\Annotation\Scheduled;
 use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 use ESD\Plugins\Scheduled\Event\ScheduledAddEvent;
 use ESD\Plugins\Scheduled\Event\ScheduledExecuteEvent;
@@ -49,6 +53,20 @@ class ScheduledPlugin extends AbstractPlugin
             $scheduledConfig = new ScheduledConfig();
         }
         $this->scheduledConfig = $scheduledConfig;
+        $this->atAfter(AnnotationsScanPlugin::class);
+    }
+
+    /**
+     * @param PluginInterfaceManager $pluginInterfaceManager
+     * @return mixed|void
+     * @throws \DI\DependencyException
+     * @throws \ESD\BaseServer\Exception
+     * @throws \ReflectionException
+     */
+    public function onAdded(PluginInterfaceManager $pluginInterfaceManager)
+    {
+        parent::onAdded($pluginInterfaceManager);
+        $pluginInterfaceManager->addPlug(new AnnotationsScanPlugin());
     }
 
     /**
@@ -64,11 +82,36 @@ class ScheduledPlugin extends AbstractPlugin
      * 在服务启动前
      * @param Context $context
      * @return mixed
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      * @throws \ESD\BaseServer\Server\Exception\ConfigException
      * @throws \ReflectionException
      */
     public function beforeServerStart(Context $context)
     {
+        //查看注解
+        $scanClass = Server::$instance->getContainer()->get(ScanClass::class);
+        $reflectionMethods = $scanClass->findMethodsByAnn(Scheduled::class);
+        foreach ($reflectionMethods as $reflectionMethod) {
+            $reflectionClass = $reflectionMethod->getDeclaringClass();
+            $scheduled = $scanClass->getCachedReader()->getMethodAnnotation($reflectionMethod, Scheduled::class);
+            if ($scheduled instanceof Scheduled) {
+                if (empty($scheduled->name)) {
+                    $scheduled->name = $reflectionClass->getName() . "::" . $reflectionMethod->getName();
+                }
+                if (empty($scheduled->cron)) {
+                    $this->warn("{$scheduled->name}任务没有设置cron，已忽略");
+                    continue;
+                }
+                $scheduledTask = new ScheduledTask(
+                    $scheduled->name,
+                    $scheduled->cron,
+                    $reflectionClass->getName(),
+                    $reflectionMethod->getName(),
+                    $scheduled->processGroup);
+                $this->scheduledConfig->addScheduled($scheduledTask);
+            }
+        }
         //添加一个helper进程
         $this->scheduledConfig->merge();
         $context->getServer()->addProcess(self::processName, HelperScheduledProcess::class, self::processGroupName);
@@ -81,7 +124,7 @@ class ScheduledPlugin extends AbstractPlugin
      */
     public function beforeProcessStart(Context $context)
     {
-        new Scheduled();
+        new ScheduledTaskHandle();
         //Help进程
         if ($context->getServer()->getProcessManager()->getCurrentProcess()->getProcessName() === self::processName) {
             //初始化计数器

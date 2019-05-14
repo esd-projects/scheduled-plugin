@@ -1,6 +1,7 @@
 {
   "require": {
-    "esd/base-server": "~0.1"
+    "esd/base-server": "~0.1",
+    "esd/annotations-scan-plugin": "~0.1"
   },
   "autoload": {
     "psr-4": {

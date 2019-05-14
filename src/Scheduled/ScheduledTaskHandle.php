@@ -14,7 +14,7 @@ use ESD\BaseServer\Server\Server;
 use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 use ESD\Plugins\Scheduled\Event\ScheduledExecuteEvent;
 
-class Scheduled
+class ScheduledTaskHandle
 {
     use GetLogger;
 

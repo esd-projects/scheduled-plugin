@@ -15,3 +15,7 @@ scheduled:
       class_name: ESD\Plugins\Scheduled\ExampleClass\TestScheduledTask
       function_name: test
       process_group: all
+
+scan:
+  include_paths:
+    exampleClass: /mnt/c/Users/administrato/PhpstormProjects/scheduled-plugin/exampleClass
