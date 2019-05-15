@@ -39,7 +39,7 @@ class ScheduledTask extends BaseConfig
     /**
      * @var string
      */
-    protected $processGroup;
+    protected $processGroup = ScheduledTask::GroupName;
 
     /**
      * @var CronExpression

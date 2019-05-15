@@ -9,6 +9,7 @@
 namespace ESD\Plugins\Scheduled\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
+use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 
 /**
  * @Annotation
@@ -32,5 +33,5 @@ class Scheduled extends Annotation
      * 进程组
      * @var string
      */
-    public $processGroup = "all";
+    public $processGroup = ScheduledTask::GroupName;
 }
