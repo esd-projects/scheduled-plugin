@@ -16,6 +16,7 @@ class ScheduledTask extends BaseConfig
 {
     const key = "scheduled.task";
     const ProcessGroupAll = "all";
+    const GroupName = "ScheduledGroup";
     /**
      * @var string
      */
@@ -54,7 +55,7 @@ class ScheduledTask extends BaseConfig
      * @param string $processGroup
      * @throws \ReflectionException
      */
-    public function __construct($name, $expression, $className, $functionName, $processGroup = ScheduledTask::ProcessGroupAll)
+    public function __construct($name, $expression, $className, $functionName, $processGroup = ScheduledTask::GroupName)
     {
         parent::__construct(self::key);
         $this->name = $name;

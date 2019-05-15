@@ -115,6 +115,11 @@ class ScheduledPlugin extends AbstractPlugin
         //添加一个helper进程
         $this->scheduledConfig->merge();
         $context->getServer()->addProcess(self::processName, HelperScheduledProcess::class, self::processGroupName);
+        //添加任务进程
+        for ($i = 0; $i < $this->scheduledConfig->getTaskProcessCount(); $i++) {
+            $context->getServer()->addProcess("scheduled-$i", ScheduledProcess::class, ScheduledTask::GroupName);
+        }
+
     }
 
     /**

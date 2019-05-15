@@ -19,15 +19,29 @@ use ESD\Plugins\Scheduled\Event\ScheduledRemoveEvent;
 class ScheduledConfig extends BaseConfig
 {
     const key = "scheduled";
+
     /**
      * 最小间隔时间
      * @var int
      */
     protected $minIntervalTime;
+
+    /**
+     * 任务进程数量
+     * @var int
+     */
+    protected $taskProcessCount = 1;
+
+    /**
+     * @var string
+     */
+    protected $taskProcessGroupName = ScheduledTask::GroupName;
+
     /**
      * @var ScheduledTask[]
      */
     protected $scheduledTasks = [];
+
 
     /**
      * ScheduledConfig constructor.
@@ -120,5 +134,37 @@ class ScheduledConfig extends BaseConfig
     public function setMinIntervalTime(int $minIntervalTime): void
     {
         $this->minIntervalTime = $minIntervalTime;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTaskProcessCount(): int
+    {
+        return $this->taskProcessCount;
+    }
+
+    /**
+     * @param int $taskProcessCount
+     */
+    public function setTaskProcessCount(int $taskProcessCount): void
+    {
+        $this->taskProcessCount = $taskProcessCount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTaskProcessGroupName(): string
+    {
+        return $this->taskProcessGroupName;
+    }
+
+    /**
+     * @param string $taskProcessGroupName
+     */
+    public function setTaskProcessGroupName(string $taskProcessGroupName): void
+    {
+        $this->taskProcessGroupName = $taskProcessGroupName;
     }
 }
