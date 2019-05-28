@@ -7,13 +7,13 @@
  */
 
 namespace ESD\Plugins\Scheduled;
-
-use ESD\BaseServer\Coroutine\Channel;
-use ESD\BaseServer\Plugins\Logger\GetLogger;
-use ESD\BaseServer\Server\Context;
-use ESD\BaseServer\Server\Plugin\AbstractPlugin;
-use ESD\BaseServer\Server\PlugIn\PluginInterfaceManager;
-use ESD\BaseServer\Server\Server;
+use ESD\Core\Channel\Channel;
+use ESD\Core\Context\Context;
+use ESD\Core\PlugIn\AbstractPlugin;
+use ESD\Core\PlugIn\PluginInterfaceManager;
+use ESD\Core\Plugins\Event\Event;
+use ESD\Core\Plugins\Event\EventCall;
+use ESD\Core\Plugins\Logger\GetLogger;
 use ESD\Plugins\AnnotationsScan\AnnotationsScanPlugin;
 use ESD\Plugins\AnnotationsScan\ScanClass;
 use ESD\Plugins\Scheduled\Annotation\Scheduled;
@@ -21,6 +21,7 @@ use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 use ESD\Plugins\Scheduled\Event\ScheduledAddEvent;
 use ESD\Plugins\Scheduled\Event\ScheduledExecuteEvent;
 use ESD\Plugins\Scheduled\Event\ScheduledRemoveEvent;
+use ESD\Server\Co\Server;
 
 class ScheduledPlugin extends AbstractPlugin
 {
@@ -43,7 +44,8 @@ class ScheduledPlugin extends AbstractPlugin
      * ScheduledPlugin constructor.
      * @param ScheduledConfig|null $scheduledConfig
      * @throws \DI\DependencyException
-     * @throws \ESD\BaseServer\Server\Exception\ConfigException
+     * @throws \DI\NotFoundException
+     * @throws \ESD\Core\Plugins\Config\ConfigException
      * @throws \ReflectionException
      */
     public function __construct(ScheduledConfig $scheduledConfig = null)
@@ -60,8 +62,9 @@ class ScheduledPlugin extends AbstractPlugin
      * @param PluginInterfaceManager $pluginInterfaceManager
      * @return mixed|void
      * @throws \DI\DependencyException
-     * @throws \ESD\BaseServer\Exception
      * @throws \ReflectionException
+     * @throws \DI\NotFoundException
+     * @throws \ESD\Core\Exception
      */
     public function onAdded(PluginInterfaceManager $pluginInterfaceManager)
     {
@@ -81,11 +84,10 @@ class ScheduledPlugin extends AbstractPlugin
     /**
      * 在服务启动前
      * @param Context $context
-     * @return mixed
      * @throws \DI\DependencyException
      * @throws \DI\NotFoundException
-     * @throws \ESD\BaseServer\Server\Exception\ConfigException
      * @throws \ReflectionException
+     * @throws \ESD\Core\Plugins\Config\ConfigException
      */
     public function beforeServerStart(Context $context)
     {
@@ -93,8 +95,8 @@ class ScheduledPlugin extends AbstractPlugin
         $scanClass = Server::$instance->getContainer()->get(ScanClass::class);
         $reflectionMethods = $scanClass->findMethodsByAnn(Scheduled::class);
         foreach ($reflectionMethods as $reflectionMethod) {
-            $reflectionClass = $reflectionMethod->getDeclaringClass();
-            $scheduled = $scanClass->getCachedReader()->getMethodAnnotation($reflectionMethod, Scheduled::class);
+            $reflectionClass = $reflectionMethod->getParentReflectClass();
+            $scheduled = $scanClass->getCachedReader()->getMethodAnnotation($reflectionMethod->getReflectionMethod(), Scheduled::class);
             if ($scheduled instanceof Scheduled) {
                 if (empty($scheduled->name)) {
                     $scheduled->name = $reflectionClass->getName() . "::" . $reflectionMethod->getName();
@@ -114,10 +116,10 @@ class ScheduledPlugin extends AbstractPlugin
         }
         //添加一个helper进程
         $this->scheduledConfig->merge();
-        $context->getServer()->addProcess(self::processName, HelperScheduledProcess::class, self::processGroupName);
+        Server::$instance->addProcess(self::processName, HelperScheduledProcess::class, self::processGroupName);
         //添加任务进程
         for ($i = 0; $i < $this->scheduledConfig->getTaskProcessCount(); $i++) {
-            $context->getServer()->addProcess("scheduled-$i", ScheduledProcess::class, ScheduledTask::GroupName);
+            Server::$instance->addProcess("scheduled-$i", ScheduledProcess::class, ScheduledTask::GroupName);
         }
 
     }
@@ -125,30 +127,27 @@ class ScheduledPlugin extends AbstractPlugin
     /**
      * 在进程启动前
      * @param Context $context
-     * @return mixed
      */
     public function beforeProcessStart(Context $context)
     {
         new ScheduledTaskHandle();
         //Help进程
-        if ($context->getServer()->getProcessManager()->getCurrentProcess()->getProcessName() === self::processName) {
+        if (Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() === self::processName) {
             //初始化计数器
             foreach (Server::$instance->getProcessManager()->getProcesses() as $process) {
                 $this->processScheduledCount[$process->getProcessId()] = 0;
             }
             //监听动态添加/移除的任务事件
             goWithContext(function () {
-                $channel = new Channel();
-                Server::$instance->getEventDispatcher()->listen(ScheduledAddEvent::ScheduledAddEvent, $channel);
-                Server::$instance->getEventDispatcher()->listen(ScheduledRemoveEvent::ScheduledRemoveEvent, $channel);
-                while (true) {
-                    $event = $channel->pop();
+                $call = Server::$instance->getEventDispatcher()->listen(ScheduledAddEvent::ScheduledAddEvent);
+                Server::$instance->getEventDispatcher()->listen(ScheduledRemoveEvent::ScheduledRemoveEvent, $call);
+                $call->call(function (Event $event){
                     if ($event instanceof ScheduledAddEvent) {
                         $this->scheduledConfig->addScheduled($event->getTask());
                     } else if ($event instanceof ScheduledRemoveEvent) {
                         $this->scheduledConfig->removeScheduled($event->getTaskName());
                     }
-                }
+                });
             });
             //添加定时器调度
             addTimerTick($this->scheduledConfig->getMinIntervalTime(), function () {

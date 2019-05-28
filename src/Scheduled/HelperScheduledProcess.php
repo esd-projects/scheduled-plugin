@@ -8,9 +8,8 @@
 
 namespace ESD\Plugins\Scheduled;
 
-
-use ESD\BaseServer\Server\Message\Message;
-use ESD\BaseServer\Server\Process;
+use ESD\Core\Message\Message;
+use ESD\Core\Server\Process\Process;
 
 class HelperScheduledProcess extends Process
 {

@@ -8,7 +8,7 @@
 
 namespace ESD\Plugins\Scheduled\ExampleClass;
 
-use ESD\BaseServer\Plugins\Logger\GetLogger;
+use ESD\Core\Plugins\Logger\GetLogger;
 use ESD\Plugins\AnnotationsScan\Annotation\Component;
 use ESD\Plugins\Scheduled\Annotation\Scheduled;
 

@@ -8,7 +8,7 @@
 
 namespace ESD\Plugins\Scheduled\Event;
 
-use ESD\BaseServer\Plugins\Event\Event;
+use ESD\Core\Plugins\Event\Event;
 use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 
 class ScheduledRemoveEvent extends Event

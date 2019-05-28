@@ -8,8 +8,7 @@
 
 namespace ESD\Plugins\Scheduled\Beans;
 
-
-use ESD\BaseServer\Plugins\Config\BaseConfig;
+use ESD\Core\Plugins\Config\BaseConfig;
 use ESD\Plugins\Scheduled\Cron\CronExpression;
 
 class ScheduledTask extends BaseConfig

@@ -8,13 +8,12 @@
 
 namespace ESD\Plugins\Scheduled;
 
-
-use ESD\BaseServer\Plugins\Config\BaseConfig;
-use ESD\BaseServer\Server\Exception\ConfigException;
-use ESD\BaseServer\Server\Server;
+use ESD\Core\Plugins\Config\BaseConfig;
+use ESD\Core\Plugins\Config\ConfigException;
 use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 use ESD\Plugins\Scheduled\Event\ScheduledAddEvent;
 use ESD\Plugins\Scheduled\Event\ScheduledRemoveEvent;
+use ESD\Server\Co\Server;
 
 class ScheduledConfig extends BaseConfig
 {
@@ -61,6 +60,8 @@ class ScheduledConfig extends BaseConfig
     /**
      * 添加调度
      * @param ScheduledTask $scheduledTask
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function addScheduled(ScheduledTask $scheduledTask)
     {
@@ -79,6 +80,8 @@ class ScheduledConfig extends BaseConfig
     /**
      * 移除调度
      * @param String $scheduledTaskName
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
     public function removeScheduled(String $scheduledTaskName)
     {

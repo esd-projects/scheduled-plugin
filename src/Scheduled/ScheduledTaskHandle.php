@@ -7,12 +7,10 @@
  */
 
 namespace ESD\Plugins\Scheduled;
-
-
-use ESD\BaseServer\Plugins\Logger\GetLogger;
-use ESD\BaseServer\Server\Server;
+use ESD\Core\Plugins\Logger\GetLogger;
 use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 use ESD\Plugins\Scheduled\Event\ScheduledExecuteEvent;
+use ESD\Server\Co\Server;
 
 class ScheduledTaskHandle
 {
@@ -22,15 +20,12 @@ class ScheduledTaskHandle
     {
         //监听任务事件的执行
         goWithContext(function () {
-            $channel = Server::$instance->getEventDispatcher()->listen(ScheduledExecuteEvent::ScheduledExecuteEvent);
-            while (true) {
-                $event = $channel->pop();
-                if ($event instanceof ScheduledExecuteEvent) {
-                    goWithContext(function () use ($event) {
-                        $this->execute($event->getTask());
-                    });
-                }
-            }
+            $call = Server::$instance->getEventDispatcher()->listen(ScheduledExecuteEvent::ScheduledExecuteEvent);
+            $call->call(function (ScheduledExecuteEvent $event){
+                goWithContext(function () use ($event) {
+                    $this->execute($event->getTask());
+                });
+            });
         });
     }
 

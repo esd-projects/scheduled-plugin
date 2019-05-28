@@ -8,14 +8,13 @@
 
 namespace ESD\Plugins\Scheduled\ExampleClass;
 
-
-use ESD\BaseServer\Server\Beans\Request;
-use ESD\BaseServer\Server\Beans\Response;
-use ESD\BaseServer\Server\Beans\WebSocketFrame;
-use ESD\BaseServer\Server\Server;
-use ESD\BaseServer\Server\ServerPort;
+use ESD\Core\Server\Beans\Request;
+use ESD\Core\Server\Beans\Response;
+use ESD\Core\Server\Beans\WebSocketFrame;
+use ESD\Core\Server\Port\ServerPort;
 use ESD\Plugins\Scheduled\Beans\ScheduledTask;
 use ESD\Plugins\Scheduled\ScheduledPlugin;
+use ESD\Server\Co\Server;
 
 class TestPort extends ServerPort
 {
@@ -40,10 +39,17 @@ class TestPort extends ServerPort
         // TODO: Implement onUdpPacket() method.
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     * @throws \ReflectionException
+     */
     public function onHttpRequest(Request $request, Response $response)
     {
         $scheduledTask = new ScheduledTask("DynamicAdd", "* * * * * *", TestScheduledTask::class, "dynamic");
-        if($request->getServer(Request::SERVER_REQUEST_URI)=="/add") {
+        if ($request->getServer(Request::SERVER_REQUEST_URI) == "/add") {
             $scheduledPlugin = Server::$instance->getPlugManager()->getPlug(ScheduledPlugin::class);
             if ($scheduledPlugin instanceof ScheduledPlugin) {
                 $scheduledPlugin->getScheduledConfig()->addScheduled(
@@ -51,7 +57,7 @@ class TestPort extends ServerPort
                 );
             }
             $response->end("add");
-        }else{
+        } else {
             $scheduledPlugin = Server::$instance->getPlugManager()->getPlug(ScheduledPlugin::class);
             if ($scheduledPlugin instanceof ScheduledPlugin) {
                 $scheduledPlugin->getScheduledConfig()->removeScheduled($scheduledTask->getName());
@@ -73,5 +79,10 @@ class TestPort extends ServerPort
     public function onWsPassCustomHandshake(Request $request): bool
     {
         // TODO: Implement onWsPassCustomHandshake() method.
+    }
+
+    public function onWsClose(int $fd, int $reactorId)
+    {
+        // TODO: Implement onWsClose() method.
     }
 }
