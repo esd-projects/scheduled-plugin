@@ -7,12 +7,11 @@
  */
 
 namespace ESD\Plugins\Scheduled;
-use ESD\Core\Channel\Channel;
+
 use ESD\Core\Context\Context;
 use ESD\Core\PlugIn\AbstractPlugin;
 use ESD\Core\PlugIn\PluginInterfaceManager;
 use ESD\Core\Plugins\Event\Event;
-use ESD\Core\Plugins\Event\EventCall;
 use ESD\Core\Plugins\Logger\GetLogger;
 use ESD\Plugins\AnnotationsScan\AnnotationsScanPlugin;
 use ESD\Plugins\AnnotationsScan\ScanClass;
@@ -91,29 +90,6 @@ class ScheduledPlugin extends AbstractPlugin
      */
     public function beforeServerStart(Context $context)
     {
-        //查看注解
-        $scanClass = Server::$instance->getContainer()->get(ScanClass::class);
-        $reflectionMethods = $scanClass->findMethodsByAnn(Scheduled::class);
-        foreach ($reflectionMethods as $reflectionMethod) {
-            $reflectionClass = $reflectionMethod->getParentReflectClass();
-            $scheduled = $scanClass->getCachedReader()->getMethodAnnotation($reflectionMethod->getReflectionMethod(), Scheduled::class);
-            if ($scheduled instanceof Scheduled) {
-                if (empty($scheduled->name)) {
-                    $scheduled->name = $reflectionClass->getName() . "::" . $reflectionMethod->getName();
-                }
-                if (empty($scheduled->cron)) {
-                    $this->warn("{$scheduled->name}任务没有设置cron，已忽略");
-                    continue;
-                }
-                $scheduledTask = new ScheduledTask(
-                    $scheduled->name,
-                    $scheduled->cron,
-                    $reflectionClass->getName(),
-                    $reflectionMethod->getName(),
-                    $scheduled->processGroup);
-                $this->scheduledConfig->addScheduled($scheduledTask);
-            }
-        }
         //添加一个helper进程
         $this->scheduledConfig->merge();
         Server::$instance->addProcess(self::processName, HelperScheduledProcess::class, self::processGroupName);
@@ -121,18 +97,44 @@ class ScheduledPlugin extends AbstractPlugin
         for ($i = 0; $i < $this->scheduledConfig->getTaskProcessCount(); $i++) {
             Server::$instance->addProcess("scheduled-$i", ScheduledProcess::class, ScheduledTask::GroupName);
         }
-
     }
 
     /**
      * 在进程启动前
      * @param Context $context
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     * @throws \ReflectionException
      */
     public function beforeProcessStart(Context $context)
     {
         new ScheduledTaskHandle();
         //Help进程
         if (Server::$instance->getProcessManager()->getCurrentProcess()->getProcessName() === self::processName) {
+            //查看注解
+            $scanClass = Server::$instance->getContainer()->get(ScanClass::class);
+            $reflectionMethods = $scanClass->findMethodsByAnn(Scheduled::class);
+            foreach ($reflectionMethods as $reflectionMethod) {
+                $reflectionClass = $reflectionMethod->getParentReflectClass();
+                $scheduled = $scanClass->getCachedReader()->getMethodAnnotation($reflectionMethod->getReflectionMethod(), Scheduled::class);
+                if ($scheduled instanceof Scheduled) {
+                    if (empty($scheduled->name)) {
+                        $scheduled->name = $reflectionClass->getName() . "::" . $reflectionMethod->getName();
+                    }
+                    if (empty($scheduled->cron)) {
+                        $this->warn("{$scheduled->name}任务没有设置cron，已忽略");
+                        continue;
+                    }
+                    $scheduledTask = new ScheduledTask(
+                        $scheduled->name,
+                        $scheduled->cron,
+                        $reflectionClass->getName(),
+                        $reflectionMethod->getName(),
+                        $scheduled->processGroup);
+                    $this->scheduledConfig->addScheduled($scheduledTask);
+                }
+            }
+
             //初始化计数器
             foreach (Server::$instance->getProcessManager()->getProcesses() as $process) {
                 $this->processScheduledCount[$process->getProcessId()] = 0;
@@ -141,7 +143,7 @@ class ScheduledPlugin extends AbstractPlugin
             goWithContext(function () {
                 $call = Server::$instance->getEventDispatcher()->listen(ScheduledAddEvent::ScheduledAddEvent);
                 Server::$instance->getEventDispatcher()->listen(ScheduledRemoveEvent::ScheduledRemoveEvent, $call);
-                $call->call(function (Event $event){
+                $call->call(function (Event $event) {
                     if ($event instanceof ScheduledAddEvent) {
                         $this->scheduledConfig->addScheduled($event->getTask());
                     } else if ($event instanceof ScheduledRemoveEvent) {
